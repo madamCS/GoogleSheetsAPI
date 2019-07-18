@@ -49,8 +49,8 @@ async function createSheet(authToken) {
    sheet.spreadsheets.create(request, { 
   	}).then(function(response)  {
     // Deal with response data.
-    var spreadsheetId = response.data.spreadsheetId;
-    console.log("Spreadsheet ID: " + spreadsheetId);
+    var spreadsheetUrl = response.data.spreadsheetUrl;
+    console.log("Spreadsheet ID: " + spreadsheetUrl);
    }).catch(function(err) { console.log("Caught error is: " + err) 
    });
 }
