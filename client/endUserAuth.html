@@ -1,21 +1,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
-
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
         <title>CLOUD VISION</title>
 
-          // TODO: Update CSS_SHEET_FILENAME accordingly.
+          <!--TODO: Update CSS_SHEET_FILENAME accordingly.-->
           <link rel="stylesheet" href="CSS_SHEET_FILENAME">
           <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
-          
-
     </head>
-
     <body>
-
-    <pre id="output">
-    <!-- OUTPUT MSG GOES HERE -->
-    </pre>
+    <a id="link" target="_blank"><!--OUTPUT LINK--></a>
 
     <script type="text/javascript">
       /** GLOBAL VARIABLES **/
@@ -38,7 +31,16 @@
       var OAUTH_TOKEN;
       var AUTH_PARAM = '';
       var FILE_ID = 'nothing';
-
+        
+    /**
+     * Makes a 'POST' fetch request to a Google Cloud
+     * Function, which in turn creates a new Google
+     * Spreadsheet.
+     * Obtains GCF's returned spreadsheetUrl and displays
+     * it as a link to the end-user.
+     *
+     * @param {AuthResponse} auth End-user authorization.
+     */
     function createSheet(auth) {
             var auth = auth;https
             var functionEndpoint = GCF_URL;
@@ -51,12 +53,22 @@
                   headers:{
                         'Content-Type': 'application/json'
                     }
-            }).then(res => {
-                document.getElementById("output").innerHTML = "Made fetch request!";
-                console.log("Response is: " + JSON.stringify(res));
+            }).then(res => res.json())
+              .then(function(url) {
+                // Obtains returned Spreadsheet URL from server.
+                var sheetUrl = url;
+                // Outputs URL as a link to user.
+                document.getElementById("link").setAttribute("href", sheetUrl);
+                document.getElementById("link").innerHTML = "Click to view your data...";
+            }).catch(err) {
+                console.log("Error is: " + err);
             }); 
      }
     
+    /**
+     *  Initializes the API client library and sets up sign-in state
+     *  listeners.
+     */
     function initClient() {
       gapi.client.init({
         'apiKey': API_KEY,
@@ -69,13 +81,19 @@
         });
      }
 
+    /**
+     *  On load, called to load the auth2 library and API client library.
+     */
     function handleClientLoad() {
       gapi.load('client:auth2', initClient);
     }
-
+        
+    /**
+     *  Called when the signed in status changes, to update the UI
+     *  appropriately. After a sign-in, the API is called.
+     */
     function updateSignInStatus(isSignedIn) {
       if (isSignedIn) {
-        //var googleUser = GoogleAuth.currentUser.get();
         var googleAuth = gapi.auth2.getAuthInstance();
         var googleUser = googleAuth.currentUser.get();
         var authParam = googleUser.getAuthResponse(true);
@@ -86,10 +104,16 @@
       }
     }
 
+    /**
+     *  Sign in the user upon button click.
+     */
     function handleSignInClick(event) {
       gapi.auth2.getAuthInstance().signIn();
     }
 
+    /**
+     *  Sign out the user upon button click.
+     */
     function handleSignOutClick(event) {
       gapi.auth2.getAuthInstance().signOut();
     }
@@ -100,9 +124,8 @@
       onreadystatechange="if (this.readyState === 'complete') this.onload()">   
     </script>
 
-    // End-user prompt buttons. 
+    <!--End-user prompt buttons.--> 
     <button id="signin-button" onclick="handleSignInClick()">Sign in</button>
     <button id="signout-button" onclick="handleSignOutClick()">Sign out</button>
-    
   </body>
 </html>
